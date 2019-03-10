@@ -416,6 +416,8 @@
 
 # Analyzing the differences
 
+## `00000000`
+
 ```
 -00000000: 2e00 00ea 24ff ae51 699a a221 3d84 820a  ....$..Qi..!=...
 +00000000: feff 3dea 24ff ae51 699a a221 3d84 820a  ..=.$..Qi..!=...
@@ -439,6 +441,8 @@ NOTE: jump to a routine that copies 0x8000 bytes from 0x8fc0000 to 0xe000000.
 It writes the Cart RAM from Cart ROM.  The routine then jumps back to 0xc0 and
 follows as the original game.
 
+## `000000b0`
+
 ```
 -000000b0: 3031 9600 0000 0000 0000 0000 00cd 0000  01..............
 +000000b0: 3031 9600 0000 0000 0000 0000 00cd 5645  01............VE
@@ -459,6 +463,8 @@ ldrbmi ip, [r6, -0xd00]
 According to https://problemkaputt.de/gbatek.htm#gbacartridgeheader 0xbe is a
 reserved area and should be zero filled.  The chinese rom has 0x0000.  This is
 part of the ROM header and is not code.
+
+## `00002a50`
 
 ```
 -00002a50: f00b 0003 f00b 0003 6011 0003 0000 0000  ........`.......
@@ -482,6 +488,8 @@ stmdaeq r0, {r4, r5, r8, sl, ip, sp, lr}
 strb r0, [r6, 0x14]
 lsrs r0, r0, 0x20
 ```
+
+## `0007c850`
 
 ```
 -0007c850: 04e0 8020 8004 00f0 6df8 051c 0349 4d81  ... ....m....IM.
@@ -521,6 +529,8 @@ does the same operations as the original cart before going back [0x08f80058 -
  0x08f80060      0248           ldr r0, aav.0x0807c865    ;[3] ; [0x8f8006c:4]=0x807c865 aav.0x0807c865
  0x08f80062      0047           bx r0                     ; aav.0x0807c865                             
 ```
+
+## `000b0b40`
 
 ```
 -000b0b40: dc00 0004 de00 0004 70b5 a2b0 0d1c 0004  ........p.......
@@ -580,6 +590,10 @@ pop {r4, r5, r6}
 pop {r1}
 bx r1
 ```
+
+NOTE: This is part A of the Eeprom_V124 SRAM patch.
+
+## `000b0c00`
 
 ```
 -000b0c00: 00f0 04f8 0004 000c 02bc 0847 f0b5 acb0  ...........G....
@@ -641,6 +655,8 @@ Chinese:
      pop {r1}
      bx r1
 ```
+
+NOTE: This is part B of Eeprom_V124 SRAM patch.
 
 # Notes
 
