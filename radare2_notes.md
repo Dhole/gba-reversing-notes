@@ -36,3 +36,21 @@ Disassemble N bytes at address, page the output:
 ```
 pd N @ addr ~..
 ```
+
+### Debugging
+
+Start mgba with gdbserver:
+```
+mgba -g chinese_zelda_minish_cap.gba
+```
+
+Start radare2 attached to gdbserver:
+```
+r2 -a arm -b 32 -s 0x8000000 -D gdb -c "e dbg.bpinmaps=false" gdb://127.0.0.1:2345
+```
+
+```
+L ningba.so ; Load GBA Plugin
+e asm.arch=arm ; Set architecture to ARM
+e asm.bits=16 ; Set ARM Thumb mode (16 bits)
+```

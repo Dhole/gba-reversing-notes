@@ -818,6 +818,7 @@ So, at some point 0x08f801b8 is copied from ROM to EWRAM.  Let's watchpoint it t
 
 # GBA I/O Map 
 
+```
 0x4000208  2    R/W  IME         Interrupt Master Enable Register
 0x4000200  2    R/W  IE          Interrupt Enable Register
 0x4000082  2    R/W  SOUNDCNT_H  Control Mixing/DMA Control
@@ -826,9 +827,10 @@ So, at some point 0x08f801b8 is copied from ROM to EWRAM.  Let's watchpoint it t
 0x40000C6  2    R/W  DMA1CNT_H   DMA 1 Control
 0x40000D2  2    R/W  DMA2CNT_H   DMA 2 Control
 0x40000DE  2    R/W  DMA3CNT_H   DMA 3 Control
+```
 
 
 ### 
 
-0x807c92c save function? YES, called from 0x0807c838
-0x807c92c(0x80000ff, 0xe000003, 0x5, 0xea)
+- 0x807c92c save function? YES, called from 0x0807c838
+- 0x807c92c(0x80000ff, 0xe000003, 0x5, 0xea)
