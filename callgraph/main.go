@@ -8,12 +8,13 @@ import (
 )
 
 const (
-	ROMStart   = 0x8000000
-	ROMEnd     = 0xa000000
-	BIOSStart  = 0x0000000
-	BIOSEnd    = 0x0004000
-	IWRAMStart = 0x3000000
-	IWRAMEnd   = 0x3008000
+	ROMStart    = 0x8000000
+	ROMEnd      = 0xa000000
+	BIOSStart   = 0x0000000
+	BIOSEnd     = 0x0004000
+	IWRAMStart  = 0x3000000
+	IWRAMEnd    = 0x3008000
+	UnknownAddr = 0xfffffff
 )
 
 type Region string
@@ -166,13 +167,17 @@ func main() {
 				inFn = false
 			}
 		}
-		if inFn && len(aj.Out) != 0 {
+		if len(aj.Out) != 0 {
 			for _, out := range aj.Out {
 				if out.Op == OpBl {
-					out.FnAddr = fnAddr
-					// if fnAddr == 0x0807c80c {
-					// 	log.Printf("DBG B %#v\n", aj.Out)
-					// }
+					if inFn {
+						out.FnAddr = fnAddr
+						// if fnAddr == 0x0807c80c {
+						// 	log.Printf("DBG B %#v\n", aj.Out)
+						// }
+					} else {
+						out.FnAddr = UnknownAddr
+					}
 				}
 			}
 		}
@@ -183,7 +188,7 @@ func main() {
 	fmt.Println("node[shape=box, fontsize=10, fontname=monospace];")
 	for _, aj := range jl.Addresses {
 		for _, out := range aj.Out {
-			if out != nil && out.Op == OpBl {
+			if out != nil && out.Op == OpBl && out.FnAddr != UnknownAddr {
 				if !repeated[uint64(out.FnAddr)<<32+uint64(out.Dst)] {
 					fmt.Printf("\"0x%08x\" -> \"0x%08x\"\n", out.FnAddr, out.Dst)
 					repeated[uint64(out.FnAddr)<<32+uint64(out.Dst)] = true
