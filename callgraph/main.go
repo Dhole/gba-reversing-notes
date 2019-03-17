@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"os"
 )
 
@@ -60,7 +61,7 @@ type Jump struct {
 
 type AddressJumps struct {
 	In  *Jump
-	Out *Jump
+	Out []*Jump
 }
 
 type JumpList struct {
@@ -85,10 +86,10 @@ func (jl *JumpList) GetIn(addr uint32) *Jump {
 
 func (jl *JumpList) AddOut(addr uint32, jump *Jump) {
 	addr -= ROMStart
-	jl.Addresses[addr/2].Out = jump
+	jl.Addresses[addr/2].Out = append(jl.Addresses[addr/2].Out, jump)
 }
 
-func (jl *JumpList) GetOut(addr uint32) *Jump {
+func (jl *JumpList) GetOut(addr uint32) []*Jump {
 	addr -= ROMStart
 	return jl.Addresses[addr/2].Out
 }
@@ -100,16 +101,25 @@ func main() {
 	}
 	defer f.Close()
 	jl := NewJumpList()
-	fmt.Println("Parsing log...")
+	log.Println("Parsing log...")
 	var lineNum int
+	var prevJump Jump
 	sc := bufio.NewScanner(f)
 	for sc.Scan() {
 		var jump Jump
 		line := sc.Text()
 		if _, err := fmt.Sscanf(line, "%c 0x%x %s %c 0x%x\n",
 			&jump.SrcMode, &jump.Src, &jump.Op, &jump.DstMode, &jump.Dst); err != nil {
-			fmt.Printf("Error in line %v: %v : %v\n", lineNum, line, err)
+			log.Printf("Error in line %v: %v : %v\n", lineNum, line, err)
 			continue
+		}
+		if prevJump.Op == OpBl && prevJump.Dst == jump.Src {
+			jump.Src = prevJump.Src
+			jump.SrcMode = prevJump.SrcMode
+			jump.Op = prevJump.Op
+			// if jump.Dst == 0x0807c80c {
+			// 	log.Printf("DBG A %#v\n", jump)
+			// }
 		}
 		if jump.Op == OpBl {
 			// if jump.Dst == 0x080b0c0c {
@@ -127,16 +137,18 @@ func main() {
 			}
 		}
 		lineNum++
+		prevJump = jump
 		// fmt.Printf("%02d: %c 0x%08x %s %c 0x%08x\n",
 		// 	i, jump.SrcMode, jump.Src, jump.Op, jump.DstMode, jump.Dst)
 	}
-	fmt.Println("Parsing log finished!")
+	log.Println("Parsing log finished!")
 	var inFn bool
 	var fnAddr uint32
 	for i := 0; i < len(jl.Addresses); i++ {
 		aj := jl.Addresses[i]
-		// if i*2+ROMStart == 0x080b0c0c {
-		// 	fmt.Printf("B) %#v\n", aj)
+		// if i*2+ROMStart == 0x807c7d6 {
+		// 	log.Printf("DBG C %#v\n", aj.Out)
+		// 	log.Printf("DBG D %#v %#v\n", inFn, fnAddr)
 		// }
 		if !inFn {
 			if aj.In != nil && aj.In.Op == OpBl {
@@ -148,20 +160,36 @@ func main() {
 				i--
 			}
 		} else {
-			if aj.Out != nil && aj.Out.Op != OpBl {
+			if len(aj.Out) != 0 && aj.Out[0].Op != OpBl {
 				// Function end
 				// fmt.Printf("0x%08x\n", aj.Out.Src)
 				inFn = false
 			}
 		}
-		if inFn && aj.Out != nil && aj.Out.Op == OpBl {
-			aj.Out.FnAddr = fnAddr
+		if inFn && len(aj.Out) != 0 {
+			for _, out := range aj.Out {
+				if out.Op == OpBl {
+					out.FnAddr = fnAddr
+					// if fnAddr == 0x0807c80c {
+					// 	log.Printf("DBG B %#v\n", aj.Out)
+					// }
+				}
+			}
 		}
 	}
 
+	repeated := make(map[uint64]bool)
+	fmt.Println("digraph G {")
+	fmt.Println("node[shape=box, fontsize=10, fontname=monospace];")
 	for _, aj := range jl.Addresses {
-		if aj.Out != nil && aj.Out.Op == OpBl {
-			fmt.Printf("\"0x%08x\" -> \"0x%08x\"\n", aj.Out.FnAddr, aj.Out.Dst)
+		for _, out := range aj.Out {
+			if out != nil && out.Op == OpBl {
+				if !repeated[uint64(out.FnAddr)<<32+uint64(out.Dst)] {
+					fmt.Printf("\"0x%08x\" -> \"0x%08x\"\n", out.FnAddr, out.Dst)
+					repeated[uint64(out.FnAddr)<<32+uint64(out.Dst)] = true
+				}
+			}
 		}
 	}
+	fmt.Println("}")
 }
