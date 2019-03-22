@@ -305,10 +305,10 @@ B: 0x080b0c0c - 0x80b0c24 f0b5acb00d1c0004010c1206170e034800688088814205d3
 
 ### Trace from A to 0x0807C83C
 
-0x0807c80c ; reached at save
-0x0807c838 -> 0x0807c92c
+0x0807c80c ; reached at save 9 times
+0x0807c838 -> 0x0807c92c ; reach at save 1 time
 0x0807c83c
-0x0807c85c -> 0x08f80055 ; SRAM to Flash patch
+0x0807c85c -> 0x08f80055 ; SRAM to Flash patch ; reach at save 1 time
 0x0807c876
 
 0x0807c92c ; reached at save
@@ -341,3 +341,12 @@ B: 0x080b0c0c - 0x80b0c24 f0b5acb00d1c0004010c1206170e034800688088814205d3
 0x080b0d6a
 
 NOTE: the chinese bootleg has been patched with the Eeprom_V124 SRAM patch!
+
+## Klonoa 2
+
+0x0802e10c ; reached only at save 32 times
+0x???????? -> 0x0803a1f8
+
+0x0803a1f8 ; reached only at save 1 time
+0x0803a260 -> 0x08051634
+0x0803a28a
