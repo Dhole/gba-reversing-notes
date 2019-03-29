@@ -21,13 +21,13 @@ _SRAM_PATCHES = {
     'EEPROM_V120': [
         (
             'a2b00d1c0004030c0348006880888342'
-            '05d3014848e0',
+            '05d30148..e0',
             '00040a1c400be0210905411807310023'
             '08781070013301320139072bf8d90020'
             '70bc02bc0847'),
         (
             '30b5a9b00d1c0004040c034800688088'
-            '844205d3014859e0',
+            '844205d30148..e0',
             '70b500040a1c400be021090541180731'
             '002310780870013301320139072bf8d9'
             '002070bc02bc0847'),
@@ -60,14 +60,29 @@ filename = sys.argv[1]
 r2 = r2pipe.open(filename)
 
 
-for storage in ['EEPROM_V', 'SRAM_V', 'FLASH_V', 'FLASH512_V', 'FLASH1M_V']:
-    print(f'Searching for {storage}nnn')
+# for storage in ['EEPROM_V', 'SRAM_V', 'FLASH_V', 'FLASH512_V', 'FLASH1M_V']:
+storage_type = None
+for storage in SRAM_PATCHES.keys():
+    print(f'Searching for {storage}')
     res = r2.cmdj(f'/j {storage}')
     if len(res) > 0:
-        print(res)
+        # print(res)
         offset = res[0]["offset"]
         print(hex(offset), ':', r2.cmd(f'ps @ {offset}'), end="")
+        storage_type = storage
         break
+
+if not storage_type:
+    sys.exit(1)
+
+patches = SRAM_PATCHES[storage_type]
+for (a, b) in patches:
+    print(f'Searching for pattern {a}')
+    res = r2.cmdj(f'/xj {a}')
+    if len(res) > 0:
+        # print(res)
+        offset = res[0]["offset"]
+        print(f'Found at {hex(offset)} :  {res[0]["data"]}')
 
 # res = r2.cmdj(f'/xj {EEPROM_V120_V112_0}')
 # print('---')

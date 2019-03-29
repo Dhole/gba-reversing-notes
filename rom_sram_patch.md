@@ -350,3 +350,33 @@ NOTE: the chinese bootleg has been patched with the Eeprom_V124 SRAM patch!
 0x0803a1f8 ; reached only at save 1 time
 0x0803a260 -> 0x08051634
 0x0803a28a
+
+# Link to the Past
+
+0x0800f808 ; (just for fun) start menu main loop
+
+0x08010b64 ; reached N times at save
+0x08010b74 -> 0x080112e0
+0x08010bb0 ; only 1 at save create
+0x08010bc4
+
+0x080112e0 ; reached 1 only at save create
+
+0x08011434 ; reached 1 only at save create
+
+0x08067a18 ; reached 1 only at save create
+
+0x08067bbc ; reached 1 times before save, 1 time at save (any)
+0x08067c3e -> 0x08067f84
+0x08067c00 -> 0x08068074
+0x08067c2c -> 0x08068074
+0x08067c58 -> 0x08068074
+0x08067c8a -> 0x08068074
+0x08067ca6 <- patch goes here
+0x08067cb2
+
+0x08067f84 ; reached N times before save
+
+0x08068074 ; reached N times at save
+
+0x08135fa8 ; reached N times before save
