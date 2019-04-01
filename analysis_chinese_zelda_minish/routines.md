@@ -52,7 +52,7 @@ CPU instruction mode: `bx`
 
 Save state from some IO Registers.  Setup IO Registers (disable interrupts,
 mixing, volume and all DMA).
-```C
+```C 32
 0x08f80070:
   // push {r2, r3, r4, r5, r6, r7}
   *0x203fc00 = (u16) *0x4000208;

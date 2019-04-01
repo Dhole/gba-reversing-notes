@@ -2,6 +2,9 @@
 
 import sys
 import r2pipe
+from shutil import copyfile
+
+SRAM_TYPE = 'SRAM_V112'
 
 _SRAM_PATCHES = {
     'EEPROM_V124': [
@@ -56,33 +59,42 @@ SRAM_PATCHES = {
 EEPROM_V120_V112_0 = 'a2b00d1c0004030c034800688088834205d30148..e0'
 
 filename = sys.argv[1]
+filename_patch = sys.argv[2]
 
-r2 = r2pipe.open(filename)
+copyfile(filename, filename_patch)
+
+r2 = r2pipe.open(filename_patch, flags=['-w'])
 
 
 # for storage in ['EEPROM_V', 'SRAM_V', 'FLASH_V', 'FLASH512_V', 'FLASH1M_V']:
 storage_type = None
 for storage in SRAM_PATCHES.keys():
-    print(f'Searching for {storage}')
+    print(f'Searching for {storage}...')
     res = r2.cmdj(f'/j {storage}')
     if len(res) > 0:
         # print(res)
         offset = res[0]["offset"]
-        print(hex(offset), ':', r2.cmd(f'ps @ {offset}'), end="")
+        print(f'Found {storage} at {hex(offset)} :', r2.cmd(f'ps @ {offset}'),
+              end="")
+        print(f'Overwriting with {SRAM_TYPE}')
+        r2.cmd(f'wz {SRAM_TYPE} @ {offset}')
         storage_type = storage
         break
 
 if not storage_type:
+    print('No supported storage type found, exiting...')
     sys.exit(1)
 
 patches = SRAM_PATCHES[storage_type]
 for (a, b) in patches:
-    print(f'Searching for pattern {a}')
+    print(f'Searching for pattern {a}...')
     res = r2.cmdj(f'/xj {a}')
     if len(res) > 0:
         # print(res)
         offset = res[0]["offset"]
         print(f'Found at {hex(offset)} :  {res[0]["data"]}')
+        print(f'Overwriting with {b}')
+        r2.cmd(f'wx {b} @ {offset}')
 
 # res = r2.cmdj(f'/xj {EEPROM_V120_V112_0}')
 # print('---')
