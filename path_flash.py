@@ -5,6 +5,7 @@ import r2pipe
 from shutil import copyfile
 
 gba_flash_patch_path = 'gba_flash.patch'
+gba_flash_patch_size = 0xbf0
 
 gba_flash_patch_addr = 0x8f80000
 flash2ram_addr = 0x8f80000
@@ -36,6 +37,17 @@ print(f'+ op0 jumps to {hex(op0_jump_addr)}')
 file_size = r2.cmdj('ij')['bin']['binsz']
 if file_size > new_size:
     print(f'! File is too big for this patch: {file_size/1024/1024} bytes')
+    sys.exit(1)
+
+print(f'+ Checking for empty space in the gba flash patch area'
+      f' ({hex(gba_flash_patch_addr)} -'
+      f' {hex(gba_flash_patch_addr + gba_flash_patch_size)})')
+
+patch_area = r2.cmdj(f'pxj {gba_flash_patch_size} @ {gba_flash_patch_addr}')
+if not (all(b == 0x00 for b in patch_area) or
+        all(b == 0xff for b in patch_area)):
+    print('!Not all bytes in the gba flash patch area are 0x00 nor 0xff')
+    sys.exit(1)
 
 print(f'> Extending file to {hex(new_size)} bytes',
       r2.cmd(f'r {new_size}'))

@@ -842,3 +842,8 @@ So, at some point 0x08f801b8 is copied from ROM to EWRAM.  Let's watchpoint it t
 
 - 0x807c92c save function? YES, called from 0x0807c838
 - 0x807c92c(0x80000ff, 0xe000003, 0x5, 0xea)
+
+###
+
+0x007fffff
+0x00ffffff
