@@ -58,6 +58,7 @@ type Jump struct {
 	Src, Dst         uint32
 	Op               Op
 	FnAddr           uint32
+	Count            uint32
 }
 
 type AddressJumps struct {
@@ -87,6 +88,14 @@ func (jl *JumpList) GetIn(addr uint32) *Jump {
 
 func (jl *JumpList) AddOut(addr uint32, jump *Jump) {
 	addr -= ROMStart
+	for _, jOut := range jl.Addresses[addr/2].Out {
+		if jOut.Dst == jump.Dst {
+			jOut.Count++
+			// jl.Addresses[addr/2].Out[i].Count++
+			return
+		}
+	}
+	jump.Count = 1
 	jl.Addresses[addr/2].Out = append(jl.Addresses[addr/2].Out, jump)
 }
 
@@ -185,13 +194,15 @@ func main() {
 
 	repeated := make(map[uint64]bool)
 	fmt.Println("digraph G {")
-	fmt.Println("node[shape=box, fontsize=10, fontname=monospace];")
+	fmt.Println("node [shape=box, fontsize=10, fontname=monospace];")
+	fmt.Println("edge [fontcolor=gray, fontsize=10, fontname=monospace];")
 	for _, aj := range jl.Addresses {
 		for _, out := range aj.Out {
 			if out != nil && out.Op == OpBl && out.FnAddr != UnknownAddr {
-				if !repeated[uint64(out.FnAddr)<<32+uint64(out.Dst)] {
-					fmt.Printf("\"0x%08x\" -> \"0x%08x\"\n", out.FnAddr, out.Dst)
-					repeated[uint64(out.FnAddr)<<32+uint64(out.Dst)] = true
+				if !repeated[uint64(out.Src)<<32+uint64(out.Dst)] {
+					fmt.Printf("\"0x%08x\" -> \"0x%08x\" [ label = \"%v 0x%08x\" ];\n",
+						out.FnAddr, out.Dst, out.Count, out.Src)
+					repeated[uint64(out.Src)<<32+uint64(out.Dst)] = true
 				}
 			}
 		}

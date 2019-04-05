@@ -59,11 +59,15 @@ SRAM_PATCHES = {
 EEPROM_V120_V112_0 = 'a2b00d1c0004030c034800688088834205d30148..e0'
 
 filename = sys.argv[1]
-filename_patch = sys.argv[2]
 
-copyfile(filename, filename_patch)
-
-r2 = r2pipe.open(filename_patch, flags=['-w'])
+write = False
+if len(sys.argv) > 2:
+    filename_patch = sys.argv[2]
+    copyfile(filename, filename_patch)
+    r2 = r2pipe.open(filename_patch, flags=['-w'])
+    write = True
+else:
+    r2 = r2pipe.open(filename)
 
 
 # for storage in ['EEPROM_V', 'SRAM_V', 'FLASH_V', 'FLASH512_V', 'FLASH1M_V']:
@@ -76,8 +80,9 @@ for storage in SRAM_PATCHES.keys():
         offset = res[0]["offset"]
         print(f'Found {storage} at {hex(offset)} :', r2.cmd(f'ps @ {offset}'),
               end="")
-        print(f'Overwriting with {SRAM_TYPE}')
-        r2.cmd(f'wz {SRAM_TYPE} @ {offset}')
+        if write:
+            print(f'Overwriting with {SRAM_TYPE}')
+            r2.cmd(f'wz {SRAM_TYPE} @ {offset}')
         storage_type = storage
         break
 
@@ -93,8 +98,9 @@ for (a, b) in patches:
         # print(res)
         offset = res[0]["offset"]
         print(f'Found at {hex(offset)} :  {res[0]["data"]}')
-        print(f'Overwriting with {b}')
-        r2.cmd(f'wx {b} @ {offset}')
+        if write:
+            print(f'Overwriting with {b}')
+            r2.cmd(f'wx {b} @ {offset}')
 
 # res = r2.cmdj(f'/xj {EEPROM_V120_V112_0}')
 # print('---')

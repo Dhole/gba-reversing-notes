@@ -372,7 +372,7 @@ NOTE: the chinese bootleg has been patched with the Eeprom_V124 SRAM patch!
 0x08067c2c -> 0x08068074
 0x08067c58 -> 0x08068074
 0x08067c8a -> 0x08068074
-0x08067ca6 <- patch goes here
+0x08067ca4 <- patch goes here
 0x08067cb2
 
 0x08067f84 ; reached N times before save
@@ -380,3 +380,14 @@ NOTE: the chinese bootleg has been patched with the Eeprom_V124 SRAM patch!
 0x08068074 ; reached N times at save
 
 0x08135fa8 ; reached N times before save
+
+# Ninja Cop
+
+0x08028cc4
+0x08028cc6 -> 0x080118c8
+
+0x080118c8
+
+0x080357dc
+
+0x080356a8 

@@ -77,7 +77,7 @@ r2.cmd(f'ahb 16 @ {save_addr}')
 # pD: print disassembly of N bytes
 ops = r2.cmdj(f'pDj 8 @ {save_addr}')
 print(f'> Overwritting ops at {hex(save_addr)} with jump to ram2flash routine '
-      f'at {ram2flash_addr}')
+      f'at {hex(ram2flash_addr)}')
 ops_hex = ''
 for op in ops:
     print(f'    {hex(op["offset"])}    {op["bytes"]}    {op["disasm"]}')
