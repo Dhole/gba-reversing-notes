@@ -50,6 +50,18 @@ CPU instruction mode: `bx`
   goto 0x0807c864; // bx 0x0807c865 ; return back to the game
 ```
 
+```asm
+0x08f80054      0349           ldr r1, [0x08f80064]        ; [0x8f80064:4]=0x8f80070
+0x08f80056      0847           bx r1                                                
+0x08f80058      0349           ldr r1, [0x08f80068]        ; [0x8f80068:4]=0x2000080
+0x08f8005a      4d81           strh r5, [r1, 0xa]                                   
+0x08f8005c      0220           movs r0, 2                                           
+0x08f8005e      c871           strb r0, [r1, 7]                                     
+0x08f80060      0248           ldr r0, [0x08f8006c]        ; [0x8f8006c:4]=0x807c865
+0x08f80062      0047           bx r0                                                
+
+```
+
 Save state from some IO Registers.  Setup IO Registers (disable interrupts,
 mixing, volume and all DMA).
 ```C 32

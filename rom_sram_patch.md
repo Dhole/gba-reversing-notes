@@ -385,6 +385,7 @@ NOTE: the chinese bootleg has been patched with the Eeprom_V124 SRAM patch!
 
 0x08028cc4
 0x08028cc6 -> 0x080118c8
+0x08028cca ; maybe patch here
 
 0x080118c8
 
